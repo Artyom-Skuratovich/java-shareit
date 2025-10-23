@@ -6,11 +6,9 @@ import lombok.Data;
 
 @Data
 public class ItemDto {
-    @NotNull
     @NotBlank
     private String name;
 
-    @NotNull
     @NotBlank
     private String description;
 
