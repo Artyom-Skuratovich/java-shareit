@@ -27,7 +27,7 @@ public class ItemController {
     public Item update(
             @RequestHeader("X-Sharer-User-Id") long userId,
             @PathVariable long itemId,
-            @RequestBody UpdateItemDto item) {
+            @Valid @RequestBody UpdateItemDto item) {
         return itemService.update(userId, itemId, item);
     }
 
