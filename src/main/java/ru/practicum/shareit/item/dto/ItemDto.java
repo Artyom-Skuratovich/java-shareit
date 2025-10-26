@@ -6,6 +6,8 @@ import lombok.Data;
 
 @Data
 public class ItemDto {
+    private Long id;
+
     @NotBlank
     private String name;
 
@@ -14,4 +16,6 @@ public class ItemDto {
 
     @NotNull
     private Boolean available;
+
+    private Long ownerId;
 }

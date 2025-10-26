@@ -12,7 +12,6 @@ import ru.practicum.shareit.user.InMemoryUserRepository;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -21,45 +20,43 @@ public class ItemServiceImpl implements ItemService {
     private final InMemoryItemRepository itemRepository;
 
     @Override
-    public Item create(long userId, ItemDto dto) {
-        Optional<User> optional = userRepository.find(userId);
-        if (optional.isEmpty()) {
-            throw new NotFoundException(String.format("Пользователь с id='%d' не найден", userId));
-        }
-        return itemRepository.create(ItemMapper.mapToItem(dto), optional.get());
+    public ItemDto create(long userId, ItemDto dto) {
+        User user = userRepository.find(userId).orElseThrow(
+                () -> new NotFoundException(String.format("Пользователь с id='%d' не найден", userId))
+        );
+        Item item = itemRepository.create(ItemMapper.mapToItem(dto), user);
+        return ItemMapper.mapToDto(item);
     }
 
     @Override
-    public Item update(long userId, long itemId, UpdateItemDto dto) {
-        Optional<Item> optional = itemRepository.find(itemId);
-        if (optional.isEmpty()) {
-            throw new NotFoundException(String.format("Предмет с id='%d' не найден", itemId));
-        }
-        Item item = ItemMapper.updateItemProperties(optional.get(), dto);
+    public ItemDto update(long userId, long itemId, UpdateItemDto dto) {
+        Item item = itemRepository.find(itemId).orElseThrow(
+                () -> new NotFoundException(String.format("Предмет с id='%d' не найден", itemId))
+        );
+        ItemMapper.updateItemProperties(item, dto);
         if (item.getOwner().getId() != userId) {
             throw new NotFoundException(
                     String.format("Предмет с id='%d' не принадлежит пользователю с id='%d'", itemId, userId)
             );
         }
-        return itemRepository.update(item);
+        return ItemMapper.mapToDto(itemRepository.update(item));
     }
 
     @Override
-    public Item find(long userId, long itemId) {
-        Optional<Item> optional = itemRepository.find(itemId);
-        if (optional.isEmpty()) {
-            throw new NotFoundException(String.format("Предмет с id='%d' не найден", itemId));
-        }
-        return optional.get();
+    public ItemDto find(long userId, long itemId) {
+        Item item = itemRepository.find(itemId).orElseThrow(
+                () -> new NotFoundException(String.format("Предмет с id='%d' не найден", itemId))
+        );
+        return ItemMapper.mapToDto(item);
     }
 
     @Override
-    public List<Item> findAll(long userId) {
-        return itemRepository.findAll(userId);
+    public List<ItemDto> findAll(long userId) {
+        return itemRepository.findAll(userId).stream().map(ItemMapper::mapToDto).toList();
     }
 
     @Override
-    public List<Item> search(long userId, String text) {
-        return itemRepository.search(text);
+    public List<ItemDto> search(long userId, String text) {
+        return itemRepository.search(text).stream().map(ItemMapper::mapToDto).toList();
     }
 }

@@ -28,4 +28,14 @@ public final class ItemMapper {
         item.setAvailable(dto.getAvailable());
         return item;
     }
+
+    public static ItemDto mapToDto(Item item) {
+        final ItemDto dto = new ItemDto();
+        dto.setId(item.getId());
+        dto.setName(item.getName());
+        dto.setDescription(item.getDescription());
+        dto.setAvailable(item.isAvailable());
+        dto.setOwnerId(item.getOwner().getId());
+        return dto;
+    }
 }

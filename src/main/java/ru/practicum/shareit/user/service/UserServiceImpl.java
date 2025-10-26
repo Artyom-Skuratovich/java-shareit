@@ -9,34 +9,31 @@ import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.Optional;
-
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
     private final InMemoryUserRepository userRepository;
 
     @Override
-    public User create(UserDto dto) {
-        return userRepository.create(UserMapper.mapToUser(dto));
+    public UserDto create(UserDto dto) {
+        return UserMapper.mapToDto(userRepository.create(UserMapper.mapToUser(dto)));
     }
 
     @Override
-    public User update(long userId, UpdateUserDto dto) {
-        Optional<User> optional = userRepository.find(userId);
-        if (optional.isEmpty()) {
-            throw new NotFoundException(String.format("Пользователь с id='%d' не найден", userId));
-        }
-        return userRepository.update(UserMapper.updateUserProperties(optional.get(), dto));
+    public UserDto update(long userId, UpdateUserDto dto) {
+        User user = userRepository.find(userId).orElseThrow(
+                () -> new NotFoundException(String.format("Пользователь с id='%d' не найден", userId))
+        );
+        user = userRepository.update(UserMapper.updateUserProperties(user, dto));
+        return UserMapper.mapToDto(user);
     }
 
     @Override
-    public User find(long userId) {
-        Optional<User> optional = userRepository.find(userId);
-        if (optional.isEmpty()) {
-            throw new NotFoundException(String.format("Пользователь с id='%d' не найден", userId));
-        }
-        return optional.get();
+    public UserDto find(long userId) {
+        User user = userRepository.find(userId).orElseThrow(
+                () -> new NotFoundException(String.format("Пользователь с id='%d' не найден", userId))
+        );
+        return UserMapper.mapToDto(user);
     }
 
     @Override

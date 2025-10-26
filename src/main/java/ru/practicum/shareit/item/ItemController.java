@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemDto;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.List;
@@ -17,14 +16,14 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public Item create(
+    public ItemDto create(
             @RequestHeader("X-Sharer-User-Id") long userId,
             @Valid @RequestBody ItemDto item) {
         return itemService.create(userId, item);
     }
 
     @PatchMapping("/{itemId}")
-    public Item update(
+    public ItemDto update(
             @RequestHeader("X-Sharer-User-Id") long userId,
             @PathVariable long itemId,
             @Valid @RequestBody UpdateItemDto item) {
@@ -32,19 +31,19 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public Item find(
+    public ItemDto find(
             @RequestHeader("X-Sharer-User-Id") long userId,
             @PathVariable long itemId) {
         return itemService.find(userId, itemId);
     }
 
     @GetMapping
-    public List<Item> findAll(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public List<ItemDto> findAll(@RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.findAll(userId);
     }
 
     @GetMapping("/search")
-    public List<Item> search(
+    public List<ItemDto> search(
             @RequestHeader("X-Sharer-User-Id") long userId,
             @RequestParam String text) {
         return itemService.search(userId, text);
