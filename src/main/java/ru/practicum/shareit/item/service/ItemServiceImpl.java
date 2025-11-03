@@ -2,35 +2,40 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.item.InMemoryItemRepository;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.shared.exception.NotFoundException;
-import ru.practicum.shareit.user.InMemoryUserRepository;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class ItemServiceImpl implements ItemService {
-    private final InMemoryUserRepository userRepository;
-    private final InMemoryItemRepository itemRepository;
+    private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
 
+    @Transactional
     @Override
     public ItemDto create(long userId, ItemDto dto) {
-        User user = userRepository.find(userId).orElseThrow(
+        User user = userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException(String.format("Пользователь с id='%d' не найден", userId))
         );
-        Item item = itemRepository.create(ItemMapper.mapToItem(dto), user);
-        return ItemMapper.mapToDto(item);
+        Item item = ItemMapper.mapToItem(dto);
+        item.setOwner(user);
+        return ItemMapper.mapToDto(itemRepository.save(item));
     }
 
+    @Transactional
     @Override
     public ItemDto update(long userId, long itemId, UpdateItemDto dto) {
-        Item item = itemRepository.find(itemId).orElseThrow(
+        Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new NotFoundException(String.format("Предмет с id='%d' не найден", itemId))
         );
         ItemMapper.updateItemProperties(item, dto);
@@ -39,12 +44,12 @@ public class ItemServiceImpl implements ItemService {
                     String.format("Предмет с id='%d' не принадлежит пользователю с id='%d'", itemId, userId)
             );
         }
-        return ItemMapper.mapToDto(itemRepository.update(item));
+        return ItemMapper.mapToDto(itemRepository.save(item));
     }
 
     @Override
     public ItemDto find(long userId, long itemId) {
-        Item item = itemRepository.find(itemId).orElseThrow(
+        Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new NotFoundException(String.format("Предмет с id='%d' не найден", itemId))
         );
         return ItemMapper.mapToDto(item);
@@ -52,7 +57,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> findAll(long userId) {
-        return itemRepository.findAll(userId).stream().map(ItemMapper::mapToDto).toList();
+        return itemRepository.findAllByOwnerId(userId).stream().map(ItemMapper::mapToDto).toList();
     }
 
     @Override

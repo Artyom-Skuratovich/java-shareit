@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user;
 
+import ru.practicum.shareit.user.dto.SimpleUserDto;
 import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
@@ -30,6 +31,12 @@ public final class UserMapper {
         dto.setId(user.getId());
         dto.setName(user.getName());
         dto.setEmail(user.getEmail());
+        return dto;
+    }
+
+    public static SimpleUserDto mapToSimpleDto(User user) {
+        SimpleUserDto dto = new SimpleUserDto();
+        dto.setId(user.getId());
         return dto;
     }
 }

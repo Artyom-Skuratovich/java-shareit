@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.repository;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.shared.exception.SameEmailException;
@@ -7,6 +7,7 @@ import ru.practicum.shareit.user.model.User;
 import java.util.HashMap;
 import java.util.Optional;
 
+@Deprecated
 @Component
 public class InMemoryUserRepository {
     private static long id = 1;

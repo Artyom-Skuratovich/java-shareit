@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.SimpleItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemDto;
 import ru.practicum.shareit.item.model.Item;
 
@@ -36,6 +37,13 @@ public final class ItemMapper {
         dto.setDescription(item.getDescription());
         dto.setAvailable(item.isAvailable());
         dto.setOwnerId(item.getOwner().getId());
+        return dto;
+    }
+
+    public static SimpleItemDto mapToSimpleDto(Item item) {
+        SimpleItemDto dto = new SimpleItemDto();
+        dto.setId(item.getId());
+        dto.setName(item.getName());
         return dto;
     }
 }
