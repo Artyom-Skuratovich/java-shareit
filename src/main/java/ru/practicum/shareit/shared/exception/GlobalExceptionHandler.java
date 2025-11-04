@@ -13,6 +13,21 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
     }
 
+    @ExceptionHandler(InvalidBookingDateException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidBookingDateException(InvalidBookingDateException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(ItemUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleItemUnavailableException(ItemUnavailableException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(NotOwnerApprovalException.class)
+    public ResponseEntity<ErrorResponse> handleNotOwnerApprovalException(NotOwnerApprovalException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
+    }
+
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
