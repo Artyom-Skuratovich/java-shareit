@@ -23,8 +23,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
     }
 
-    @ExceptionHandler(NotOwnerApprovalException.class)
-    public ResponseEntity<ErrorResponse> handleNotOwnerApprovalException(NotOwnerApprovalException e) {
+    @ExceptionHandler(UserHasNoBookingsException.class)
+    public ResponseEntity<ErrorResponse> handleUserHasNoBookingsException(UserHasNoBookingsException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(ForbiddenOperationException.class)
+    public ResponseEntity<ErrorResponse> handleNotOwnerApprovalException(ForbiddenOperationException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
     }
 

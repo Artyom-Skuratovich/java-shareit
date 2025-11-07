@@ -15,7 +15,7 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.shared.exception.InvalidBookingDateException;
 import ru.practicum.shareit.shared.exception.ItemUnavailableException;
 import ru.practicum.shareit.shared.exception.NotFoundException;
-import ru.practicum.shareit.shared.exception.NotOwnerApprovalException;
+import ru.practicum.shareit.shared.exception.ForbiddenOperationException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -55,7 +55,7 @@ public class BookingServiceImpl implements BookingService {
         );
         final Item item = booking.getItem();
         if (item.getOwner().getId() != userId) {
-            throw new NotOwnerApprovalException("Только владелец предмета может одобрить/отклонить запрос");
+            throw new ForbiddenOperationException("Только владелец предмета может одобрить/отклонить запрос");
         }
         item.setAvailable(!approved);
         itemRepository.save(item);
@@ -65,21 +65,51 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto find(long userId, long bookingId) {
-        return null;
+        final Booking booking = bookingRepository.findById(bookingId).orElseThrow(
+                () -> new NotFoundException(String.format("Бронирование с id='%d' не найдено", bookingId))
+        );
+        if (booking.getItem().getOwner().getId() != userId && booking.getBooker().getId() != userId) {
+            throw new ForbiddenOperationException("Операция доступна только владельцу вещи и автору бронирования");
+        }
+        return BookingMapper.mapToDto(booking);
     }
 
     @Override
     public List<BookingDto> findUserBookings(long userId, State state) {
-        return List.of();
+        if (!userRepository.existsById(userId)) {
+            throw new NotFoundException(String.format("Пользователь с id='%d' не найден", userId));
+        }
+        final LocalDateTime now = LocalDateTime.now();
+        final List<Booking> bookings = switch (state) {
+            case ALL -> bookingRepository.findAllByBookerId(userId);
+            case CURRENT -> bookingRepository.findCurrentBookingsByBookerId(userId, now);
+            case PAST -> bookingRepository.findPastBookingsByBookerId(userId, now);
+            case FUTURE -> bookingRepository.findFutureBookingsByBookerId(userId, now);
+            case WAITING, REJECTED ->
+                    bookingRepository.findAllByBookerIdAndStatus(userId, BookingStatus.valueOf(state.name()));
+        };
+        return bookings.stream().map(BookingMapper::mapToDto).toList();
     }
 
     @Override
     public List<BookingDto> findUserItemsBookings(long userId, State state) {
-        return List.of();
+        if (!userRepository.existsById(userId)) {
+            throw new NotFoundException(String.format("Пользователь с id='%d' не найден", userId));
+        }
+        final LocalDateTime now = LocalDateTime.now();
+        final List<Booking> bookings = switch (state) {
+            case ALL -> bookingRepository.findAllByOwnerId(userId);
+            case CURRENT -> bookingRepository.findCurrentBookingsByOwnerId(userId, now);
+            case PAST -> bookingRepository.findPastBookingsByOwnerId(userId, now);
+            case FUTURE -> bookingRepository.findFutureBookingsByOwnerId(userId, now);
+            case WAITING, REJECTED ->
+                    bookingRepository.findAllByOwnerIdAndStatus(userId, BookingStatus.valueOf(state.name()));
+        };
+        return bookings.stream().map(BookingMapper::mapToDto).toList();
     }
 
     private static void throwIfInvalidBookingDates(LocalDateTime start, LocalDateTime end) {
-        LocalDateTime now = LocalDateTime.now();
+        final LocalDateTime now = LocalDateTime.now();
         if (start.isBefore(now)) {
             throw new InvalidBookingDateException("Дата начала бронирования не может быть в прошлом");
         }

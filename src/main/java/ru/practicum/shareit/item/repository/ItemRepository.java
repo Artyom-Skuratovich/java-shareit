@@ -7,9 +7,13 @@ import ru.practicum.shareit.item.model.Item;
 import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
+    @Query("SELECT i FROM Item i " +
+            "JOIN FETCH i.owner " +
+            "WHERE i.owner.id = ?1")
     List<Item> findAllByOwnerId(long ownerId);
 
     @Query("SELECT i FROM Item i " +
+            "JOIN FETCH i.owner " +
             "WHERE i.available = true AND " +
             "(UPPER(i.name) LIKE CONCAT('%', UPPER(?1), '%') " +
             "OR UPPER(i.description) LIKE CONCAT('%', UPPER(?1), '%'))")
