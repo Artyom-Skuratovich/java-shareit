@@ -75,7 +75,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> search(long userId, String text) {
-        return itemRepository.search(text).stream().map(ItemMapper::mapToDto).toList();
+        return text.isBlank() ?
+                List.of() :
+                itemRepository.search(text).stream().map(ItemMapper::mapToDto).toList();
     }
 
     @Transactional
