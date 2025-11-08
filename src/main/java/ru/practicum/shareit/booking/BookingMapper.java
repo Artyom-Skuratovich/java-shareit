@@ -10,6 +10,8 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.Objects;
+
 public final class BookingMapper {
     private BookingMapper() {
     }
@@ -36,6 +38,7 @@ public final class BookingMapper {
     }
 
     public static SimpleBookingDto mapToSimpleDto(Booking booking) {
+        Objects.requireNonNull(booking);
         SimpleBookingDto dto = new SimpleBookingDto();
         dto.setId(booking.getId());
         dto.setStart(booking.getStart());

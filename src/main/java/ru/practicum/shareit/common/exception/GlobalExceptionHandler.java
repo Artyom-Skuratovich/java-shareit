@@ -1,4 +1,4 @@
-package ru.practicum.shareit.shared.exception;
+package ru.practicum.shareit.common.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +25,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserHasNoBookingsException.class)
     public ResponseEntity<ErrorResponse> handleUserHasNoBookingsException(UserHasNoBookingsException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(SelfBookingException.class)
+    public ResponseEntity<ErrorResponse> handleSelfBookingException(SelfBookingException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
     }
 

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingMapper;
@@ -13,8 +14,8 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.shared.exception.NotFoundException;
-import ru.practicum.shareit.shared.exception.UserHasNoBookingsException;
+import ru.practicum.shareit.common.exception.NotFoundException;
+import ru.practicum.shareit.common.exception.UserHasNoBookingsException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -101,8 +102,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private ItemFullDto toFullDto(Item item, LocalDateTime date) {
-        final Booking last = bookingRepository.findLastBooking(item.getId(), date).orElse(null);
-        final Booking next = bookingRepository.findNextBooking(item.getId(), date).orElse(null);
+        final Booking last = bookingRepository.findPastBookingsByItemId(
+                item.getId(), date, PageRequest.of(0, 1)
+        ).stream().findFirst().orElse(null);
+        final Booking next = bookingRepository.findFutureBookingsByItemId(
+                item.getId(), date, PageRequest.of(0, 1)
+        ).stream().findFirst().orElse(null);
         return ItemMapper.mapToFullDto(
                 item,
                 last != null ? BookingMapper.mapToSimpleDto(last) : null,

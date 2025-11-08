@@ -5,6 +5,7 @@ import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
+import java.util.Objects;
 
 public final class ItemMapper {
     private ItemMapper() {
@@ -42,6 +43,7 @@ public final class ItemMapper {
     }
 
     public static SimpleItemDto mapToSimpleDto(Item item) {
+        Objects.requireNonNull(item);
         SimpleItemDto dto = new SimpleItemDto();
         dto.setId(item.getId());
         dto.setName(item.getName());

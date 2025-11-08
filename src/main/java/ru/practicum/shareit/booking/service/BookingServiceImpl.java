@@ -12,10 +12,7 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.shared.exception.InvalidBookingDateException;
-import ru.practicum.shareit.shared.exception.ItemUnavailableException;
-import ru.practicum.shareit.shared.exception.NotFoundException;
-import ru.practicum.shareit.shared.exception.ForbiddenOperationException;
+import ru.practicum.shareit.common.exception.*;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -40,6 +37,9 @@ public class BookingServiceImpl implements BookingService {
         final Item item = itemRepository.findById(request.getItemId()).orElseThrow(
                 () -> new NotFoundException(String.format("Предмет с id='%d' не найден", request.getItemId()))
         );
+        if (item.getOwner().getId() == userId) {
+            throw new SelfBookingException("Владелец вещи не может забронировать её же");
+        }
         if (!item.isAvailable()) {
             throw new ItemUnavailableException(String.format("Предмет с id='%d' недоступен", item.getId()));
         }
@@ -53,6 +53,13 @@ public class BookingServiceImpl implements BookingService {
         final Booking booking = bookingRepository.findById(bookingId).orElseThrow(
                 () -> new NotFoundException(String.format("Запрос на бронирование с id='%d' не найден", bookingId))
         );
+        if (booking.getStatus() != BookingStatus.WAITING) {
+            throw new ForbiddenOperationException(String.format(
+                    "Подтвердить/отклонить запрос нельзя, так как его статус - %s, допустимый статус - %s",
+                    booking.getStatus().name(),
+                    BookingStatus.WAITING.name()
+            ));
+        }
         final Item item = booking.getItem();
         if (item.getOwner().getId() != userId) {
             throw new ForbiddenOperationException("Только владелец предмета может одобрить/отклонить запрос");

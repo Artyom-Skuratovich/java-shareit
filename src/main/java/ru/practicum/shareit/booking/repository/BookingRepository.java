@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.model.Booking;
@@ -7,7 +9,6 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking b " +
@@ -88,21 +89,18 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "ORDER BY b.start DESC")
     List<Booking> findAllByOwnerIdAndStatus(long ownerId, BookingStatus status);
 
-    @Query("SELECT b from Booking b " +
+    @Query("SELECT b FROM Booking b " +
             "JOIN FETCH b.booker " +
-            "WHERE b.item.id = ?1 " +
-            "AND b.end >= ?2 " +
-            "AND b.start <= ?2 " +
-            "ORDER BY b.end DESC " +
-            "LIMIT 1")
-    Optional<Booking> findLastBooking(long itemId, LocalDateTime date);
+            "WHERE b.item.id = ?1 AND " +
+            "b.end >= ?2 AND b.start <= ?2 " +
+            "ORDER BY b.end DESC")
+    Page<Booking> findPastBookingsByItemId(long itemId, LocalDateTime date, Pageable pageable);
 
     @Query("SELECT b from Booking b " +
             "JOIN FETCH b.booker " +
             "WHERE b.item.id = ?1 AND b.start > ?2 " +
-            "ORDER BY b.start ASC " +
-            "LIMIT 1")
-    Optional<Booking> findNextBooking(long itemId, LocalDateTime date);
+            "ORDER BY b.start ASC")
+    Page<Booking> findFutureBookingsByItemId(long itemId, LocalDateTime date, Pageable pageable);
 
     @Query("SELECT COUNT(b) > 0 FROM Booking b " +
             "WHERE b.booker.id = ?1 AND " +

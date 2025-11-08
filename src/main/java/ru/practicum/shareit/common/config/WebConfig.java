@@ -1,9 +1,9 @@
-package ru.practicum.shareit.shared.config;
+package ru.practicum.shareit.common.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import ru.practicum.shareit.shared.converter.StringToStateConverter;
+import ru.practicum.shareit.common.converter.StringToStateConverter;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {

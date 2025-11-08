@@ -5,6 +5,8 @@ import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.Objects;
+
 public final class UserMapper {
     private UserMapper() {
     }
@@ -35,6 +37,7 @@ public final class UserMapper {
     }
 
     public static SimpleUserDto mapToSimpleDto(User user) {
+        Objects.requireNonNull(user);
         SimpleUserDto dto = new SimpleUserDto();
         dto.setId(user.getId());
         return dto;
