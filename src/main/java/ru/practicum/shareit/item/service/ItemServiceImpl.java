@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -90,7 +91,8 @@ public class ItemServiceImpl implements ItemService {
         final Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new NotFoundException(String.format("Предмет с id='%d' не найден", itemId))
         );
-        if (!bookingRepository.existsPastBookingByBookerId(userId, itemId, LocalDateTime.now())) {
+        final List<BookingStatus> includedStatuses = List.of(BookingStatus.APPROVED);
+        if (!bookingRepository.existsPastBookingByBookerId(userId, itemId, LocalDateTime.now(), includedStatuses)) {
             throw new UserHasNoBookingsException(String.format(
                     "У пользователя с id='%d' нет завершённых бронирований предмета с id='%d'",
                     userId,
@@ -103,10 +105,16 @@ public class ItemServiceImpl implements ItemService {
 
     private ItemFullDto toFullDto(Item item, LocalDateTime date) {
         final Booking last = bookingRepository.findPastBookingsByItemId(
-                item.getId(), date, PageRequest.of(0, 1)
+                item.getId(),
+                date,
+                List.of(BookingStatus.APPROVED, BookingStatus.CANCELED),
+                PageRequest.of(0, 1)
         ).stream().findFirst().orElse(null);
         final Booking next = bookingRepository.findFutureBookingsByItemId(
-                item.getId(), date, PageRequest.of(0, 1)
+                item.getId(),
+                date,
+                List.of(BookingStatus.APPROVED),
+                PageRequest.of(0, 1)
         ).stream().findFirst().orElse(null);
         return ItemMapper.mapToFullDto(
                 item,

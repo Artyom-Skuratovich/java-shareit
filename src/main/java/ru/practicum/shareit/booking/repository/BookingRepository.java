@@ -92,19 +92,34 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking b " +
             "JOIN FETCH b.booker " +
             "WHERE b.item.id = ?1 AND " +
-            "b.end >= ?2 AND b.start <= ?2 " +
+            "b.end >= ?2 AND b.start <= ?2 AND " +
+            "b.status IN (?3) " +
             "ORDER BY b.end DESC")
-    Page<Booking> findPastBookingsByItemId(long itemId, LocalDateTime date, Pageable pageable);
+    Page<Booking> findPastBookingsByItemId(
+            long itemId,
+            LocalDateTime date,
+            List<BookingStatus> includedStatuses,
+            Pageable pageable);
 
     @Query("SELECT b from Booking b " +
             "JOIN FETCH b.booker " +
-            "WHERE b.item.id = ?1 AND b.start > ?2 " +
+            "WHERE b.item.id = ?1 AND b.start > ?2 AND " +
+            "b.status IN (?3) " +
             "ORDER BY b.start ASC")
-    Page<Booking> findFutureBookingsByItemId(long itemId, LocalDateTime date, Pageable pageable);
+    Page<Booking> findFutureBookingsByItemId(
+            long itemId,
+            LocalDateTime date,
+            List<BookingStatus> includedStatuses,
+            Pageable pageable);
 
     @Query("SELECT COUNT(b) > 0 FROM Booking b " +
             "WHERE b.booker.id = ?1 AND " +
             "b.item.id = ?2 AND " +
-            "b.end < ?3")
-    boolean existsPastBookingByBookerId(long bookerId, long itemId, LocalDateTime date);
+            "b.end < ?3 AND " +
+            "b.status IN (?4)")
+    boolean existsPastBookingByBookerId(
+            long bookerId,
+            long itemId,
+            LocalDateTime date,
+            List<BookingStatus> includedStatuses);
 }
