@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.repository;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.model.Item;
@@ -6,6 +6,7 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
 
+@Deprecated
 @Component
 public class InMemoryItemRepository {
     private static long id = 1;
