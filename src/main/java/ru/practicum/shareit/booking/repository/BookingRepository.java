@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking b " +
@@ -98,7 +99,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Page<Booking> findPastBookingsByItemId(
             long itemId,
             LocalDateTime date,
-            List<BookingStatus> includedStatuses,
+            Set<BookingStatus> includedStatuses,
             Pageable pageable);
 
     @Query("SELECT b from Booking b " +
@@ -109,7 +110,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Page<Booking> findFutureBookingsByItemId(
             long itemId,
             LocalDateTime date,
-            List<BookingStatus> includedStatuses,
+            Set<BookingStatus> includedStatuses,
             Pageable pageable);
 
     @Query("SELECT COUNT(b) > 0 FROM Booking b " +
@@ -121,5 +122,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             long bookerId,
             long itemId,
             LocalDateTime date,
-            List<BookingStatus> includedStatuses);
+            Set<BookingStatus> includedStatuses);
 }

@@ -22,6 +22,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -91,7 +92,7 @@ public class ItemServiceImpl implements ItemService {
         final Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new NotFoundException(String.format("Предмет с id='%d' не найден", itemId))
         );
-        final List<BookingStatus> includedStatuses = List.of(BookingStatus.APPROVED);
+        final Set<BookingStatus> includedStatuses = Set.of(BookingStatus.APPROVED);
         if (!bookingRepository.existsPastBookingByBookerId(userId, itemId, LocalDateTime.now(), includedStatuses)) {
             throw new UserHasNoBookingsException(String.format(
                     "У пользователя с id='%d' нет завершённых бронирований предмета с id='%d'",
@@ -107,13 +108,13 @@ public class ItemServiceImpl implements ItemService {
         final Booking last = bookingRepository.findPastBookingsByItemId(
                 item.getId(),
                 date,
-                List.of(BookingStatus.APPROVED, BookingStatus.CANCELED),
+                Set.of(BookingStatus.APPROVED, BookingStatus.CANCELED),
                 PageRequest.of(0, 1)
         ).stream().findFirst().orElse(null);
         final Booking next = bookingRepository.findFutureBookingsByItemId(
                 item.getId(),
                 date,
-                List.of(BookingStatus.APPROVED),
+                Set.of(BookingStatus.APPROVED),
                 PageRequest.of(0, 1)
         ).stream().findFirst().orElse(null);
         return ItemMapper.mapToFullDto(
