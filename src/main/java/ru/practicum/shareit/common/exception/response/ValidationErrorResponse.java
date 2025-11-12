@@ -8,8 +8,8 @@ import java.util.List;
 public class ValidationErrorResponse extends ErrorResponse {
     private final List<String> details;
 
-    public ValidationErrorResponse(String message, List<String> details) {
-        super(message);
+    public ValidationErrorResponse(String error, List<String> details) {
+        super(error);
         this.details = details;
     }
 }
