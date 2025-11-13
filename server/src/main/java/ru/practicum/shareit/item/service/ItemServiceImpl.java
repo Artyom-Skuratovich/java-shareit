@@ -113,7 +113,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private ItemFullDto toFullDto(Item item, LocalDateTime date) {
-        final Booking last = bookingRepository.findPastBookingsByItemId(
+        final Booking last = bookingRepository.findLastBookingsByItemId(
                 item.getId(),
                 date,
                 Set.of(BookingStatus.APPROVED, BookingStatus.CANCELED),

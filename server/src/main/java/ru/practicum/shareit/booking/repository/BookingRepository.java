@@ -96,7 +96,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "b.end >= ?2 AND b.start <= ?2 AND " +
             "b.status IN (?3) " +
             "ORDER BY b.end DESC")
-    Page<Booking> findPastBookingsByItemId(
+    Page<Booking> findLastBookingsByItemId(
             long itemId,
             LocalDateTime date,
             Set<BookingStatus> includedStatuses,
