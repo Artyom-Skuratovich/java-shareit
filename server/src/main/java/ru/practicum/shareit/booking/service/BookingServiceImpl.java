@@ -30,7 +30,6 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     @Override
     public BookingDto create(long userId, BookingRequest request) {
-        throwIfInvalidBookingDates(request.getStart(), request.getEnd());
         final User user = userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException(String.format("Пользователь с id='%d' не найден", userId))
         );
@@ -113,18 +112,5 @@ public class BookingServiceImpl implements BookingService {
                     bookingRepository.findAllByOwnerIdAndStatus(userId, BookingStatus.valueOf(state.name()));
         };
         return bookings.stream().map(BookingMapper::mapToDto).toList();
-    }
-
-    private static void throwIfInvalidBookingDates(LocalDateTime start, LocalDateTime end) {
-        final LocalDateTime now = LocalDateTime.now();
-        if (start.isBefore(now)) {
-            throw new InvalidBookingDateException("Дата начала бронирования не может быть в прошлом");
-        }
-        if (end.isBefore(now)) {
-            throw new InvalidBookingDateException("Дата конца бронирования не может быть в прошлом");
-        }
-        if (!start.isBefore(end)) {
-            throw new InvalidBookingDateException("Дата начала бронирования должна быть меньше даты его окончания");
-        }
     }
 }

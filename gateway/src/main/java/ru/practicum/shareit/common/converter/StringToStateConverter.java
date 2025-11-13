@@ -1,4 +1,4 @@
-package ru.practicum.shareit.common;
+package ru.practicum.shareit.common.converter;
 
 import org.springframework.core.convert.converter.Converter;
 import ru.practicum.shareit.booking.dto.State;

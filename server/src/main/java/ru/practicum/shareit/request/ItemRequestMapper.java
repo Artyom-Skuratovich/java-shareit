@@ -36,7 +36,7 @@ public final class ItemRequestMapper {
         dto.setId(itemRequest.getId());
         dto.setDescription(itemRequest.getDescription());
         dto.setCreated(itemRequest.getCreated());
-        dto.setItems(items.stream().map(ItemMapper::mapToItemResponseDto).toList());
+        dto.setItems(items.stream().map(ItemMapper::mapToResponseDto).toList());
         return dto;
     }
 }

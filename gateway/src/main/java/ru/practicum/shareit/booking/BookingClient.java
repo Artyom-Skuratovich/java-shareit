@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingRequest;
 import ru.practicum.shareit.booking.dto.State;
-import ru.practicum.shareit.common.BaseClient;
+import ru.practicum.shareit.common.client.BaseClient;
 
 import java.util.Map;
 
@@ -22,11 +22,11 @@ public class BookingClient extends BaseClient {
     }
 
     public ResponseEntity<Object> handleBookingRequest(long userId, long bookingId, boolean approved) {
-        return patch(String.format("/%d?approved={approved}", bookingId), userId, Map.of("approved", approved));
+        return patch(String.format("/%d?approved={approved}", bookingId), userId, Map.of("approved", approved), null);
     }
 
     public ResponseEntity<Object> find(long userId, long bookingId) {
-        return get(String.format("/%d", bookingId), userId);
+        return get(String.format("/%d", bookingId), userId, null);
     }
 
     public ResponseEntity<Object> findUserBookings(long userId, State state) {

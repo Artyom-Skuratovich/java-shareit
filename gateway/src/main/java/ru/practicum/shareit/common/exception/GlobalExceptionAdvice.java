@@ -1,13 +1,13 @@
-package ru.practicum.shareit.common;
+package ru.practicum.shareit.common.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import ru.practicum.shareit.common.response.ErrorResponse;
-import ru.practicum.shareit.common.response.ValidationErrorResponse;
-import ru.practicum.shareit.common.response.Violation;
+import ru.practicum.shareit.common.exception.response.ErrorResponse;
+import ru.practicum.shareit.common.exception.response.ValidationErrorResponse;
+import ru.practicum.shareit.common.exception.response.Violation;
 
 import java.util.List;
 

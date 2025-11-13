@@ -69,8 +69,8 @@ public final class ItemMapper {
         return dto;
     }
 
-    public static ItemRequestResponseDto mapToItemResponseDto(Item item) {
-        final ItemRequestResponseDto dto = new ItemRequestResponseDto();
+    public static ItemResponseDto mapToResponseDto(Item item) {
+        final ItemResponseDto dto = new ItemResponseDto();
         dto.setId(item.getId());
         dto.setName(item.getName());
         dto.setOwnerId(item.getOwner().getId());

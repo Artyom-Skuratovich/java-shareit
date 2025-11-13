@@ -6,10 +6,10 @@ import java.util.List;
 
 @Getter
 public class ValidationErrorResponse extends ErrorResponse {
-    private final List<String> details;
+    private final List<Violation> violations;
 
-    public ValidationErrorResponse(String error, List<String> details) {
+    public ValidationErrorResponse(String error, List<Violation> violations) {
         super(error);
-        this.details = details;
+        this.violations = violations;
     }
 }

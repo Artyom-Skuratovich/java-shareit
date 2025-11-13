@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.common.BaseClient;
+import ru.practicum.shareit.common.client.BaseClient;
 import ru.practicum.shareit.item.dto.NewCommentDto;
 import ru.practicum.shareit.item.dto.NewItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemDto;
@@ -23,15 +23,15 @@ public class ItemClient extends BaseClient {
     }
 
     public ResponseEntity<Object> update(long userId, long itemId, UpdateItemDto item) {
-        return patch(String.format("/%d", itemId), userId, item);
+        return patch(String.format("/%d", itemId), userId, null, item);
     }
 
     public ResponseEntity<Object> find(long userId, long itemId) {
-        return get(String.format("/%d", itemId), userId);
+        return get(String.format("/%d", itemId), userId, null);
     }
 
     public ResponseEntity<Object> findAll(long userId) {
-        return get("", userId);
+        return get("", userId, null);
     }
 
     public ResponseEntity<Object> search(long userId, String text) {

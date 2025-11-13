@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.common.BaseClient;
+import ru.practicum.shareit.common.client.BaseClient;
 import ru.practicum.shareit.request.dto.NewItemRequestDto;
 
 @Component
@@ -19,15 +19,15 @@ public class ItemRequestClient extends BaseClient {
     }
 
     public ResponseEntity<Object> findAllByUser(long userId) {
-        return get("", userId);
+        return get("", userId, null);
     }
 
     public ResponseEntity<Object> findRequestsOfOthers(long excludedUserId) {
-        return get("/all", excludedUserId);
+        return get("/all", excludedUserId, null);
     }
 
     public ResponseEntity<Object> find(long userId, long requestId) {
-        return get(String.format("/%d", requestId), userId);
+        return get(String.format("/%d", requestId), userId, null);
     }
 
     @Override
