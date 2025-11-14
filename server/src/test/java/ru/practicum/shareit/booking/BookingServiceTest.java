@@ -13,6 +13,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.common.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
@@ -101,5 +102,39 @@ public class BookingServiceTest {
         booking.setStart(LocalDateTime.now());
         List<BookingDto> result = bookingService.findUserBookings(user.getId(), State.CURRENT);
         assertFalse(result.isEmpty());
+    }
+
+    @Test
+    void findUserBookingsShouldReturnFutureBookingsWhenStateIsFUTURE() {
+        userRepository.save(user);
+        LocalDateTime now = LocalDateTime.now();
+        Booking booking = new Booking();
+        booking.setBooker(user);
+        booking.setStart(now.plusDays(1));
+        booking.setEnd(now.plusDays(5));
+        bookingRepository.save(booking);
+        List<BookingDto> result = bookingService.findUserBookings(user.getId(), State.FUTURE);
+        assertNotNull(result);
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void findUserBookingsShouldReturnAllByStatusWhenStateIsWAITING() {
+        userRepository.save(user);
+        Booking booking = new Booking();
+        booking.setBooker(user);
+        booking.setStatus(BookingStatus.WAITING);
+        bookingRepository.save(booking);
+        List<BookingDto> result = bookingService.findUserBookings(user.getId(), State.WAITING);
+        assertNotNull(result);
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void findUserBookingsShouldThrowNotFoundExceptionWhenUserNotExists() {
+        long userId = 7L;
+        assertThrows(NotFoundException.class, () -> {
+            bookingService.findUserBookings(userId, State.ALL);
+        });
     }
 }

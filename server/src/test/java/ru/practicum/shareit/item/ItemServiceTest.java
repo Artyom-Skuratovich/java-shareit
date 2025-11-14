@@ -73,7 +73,7 @@ public class ItemServiceTest {
         booking.setStatus(BookingStatus.APPROVED);
         booking.setStart(LocalDateTime.now().minusDays(3));
         booking.setEnd(LocalDateTime.now().minusDays(1));
-        booking = bookingRepository.save(booking);
+        bookingRepository.save(booking);
     }
 
     @Test
@@ -83,6 +83,20 @@ public class ItemServiceTest {
         newDto.setDescription("Description");
         newDto.setAvailable(true);
         newDto.setRequestId(itemRequest.getId());
+
+        ItemDto result = itemService.create(user.getId(), newDto);
+
+        assertNotNull(result);
+        assertEquals("New Item", result.getName());
+    }
+
+    @Test
+    public void createShouldCreateAndReturnDtoWithoutRequestId() {
+        NewItemDto newDto = new NewItemDto();
+        newDto.setName("New Item");
+        newDto.setDescription("Description");
+        newDto.setAvailable(true);
+        newDto.setRequestId(null);
 
         ItemDto result = itemService.create(user.getId(), newDto);
 
@@ -186,13 +200,23 @@ public class ItemServiceTest {
     }
 
     @Test
-    public void updateShouldThrowNotFoundExceptionWhenItemNotFound() {
+    public void updateShouldThrowNotFoundExceptionWhenUserNotFound() {
         UpdateItemDto updateDto = new UpdateItemDto();
         updateDto.setName("Updated");
         long invalidUserId = -1;
 
         assertThrows(NotFoundException.class, () ->
                 itemService.update(invalidUserId, item.getId(), updateDto)
+        );
+    }
+
+    @Test
+    public void updateShouldThrowNotFoundExceptionWhenItemNotFound() {
+        UpdateItemDto updateDto = new UpdateItemDto();
+        updateDto.setName("Updated");
+
+        assertThrows(NotFoundException.class, () ->
+                itemService.update(1, -1, updateDto)
         );
     }
 
