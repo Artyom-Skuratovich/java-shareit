@@ -13,6 +13,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.common.exception.ForbiddenOperationException;
 import ru.practicum.shareit.common.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -163,7 +164,7 @@ public class BookingServiceTest {
         bookingRepository.save(booking1);
         bookingRepository.save(booking2);
 
-        assertEquals(2, bookingRepository.findAllByBookerId(booker.getId()).size());
+        assertEquals(2, bookingService.findUserBookings(booker.getId(), State.ALL).size());
     }
 
     @Test
@@ -191,6 +192,14 @@ public class BookingServiceTest {
         bookingRepository.save(booking1);
         bookingRepository.save(booking2);
 
-        assertEquals(1, bookingRepository.findPastBookingsByBookerId(booker.getId(), LocalDateTime.now()).size());
+        assertEquals(1, bookingService.findUserBookings(booker.getId(), State.PAST).size());
+    }
+
+    @Test
+    public void handleBookingRequestShouldThrowForbiddenOperationExceptionWhenStatusIsREJECTED() {
+        booking.setStatus(BookingStatus.REJECTED);
+        assertThrows(ForbiddenOperationException.class, () ->
+                bookingService.handleBookingRequest(owner.getId(), booking.getId(), true)
+        );
     }
 }
