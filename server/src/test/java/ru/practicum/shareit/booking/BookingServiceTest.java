@@ -101,6 +101,9 @@ public class BookingServiceTest {
     @Test
     public void findUserBookingsShouldReturnList() {
         booking.setStart(LocalDateTime.now());
+        booking.setEnd(booking.getStart().plusDays(1));
+        booking = bookingRepository.save(booking);
+
         List<BookingDto> result = bookingService.findUserBookings(user.getId(), State.CURRENT);
         assertFalse(result.isEmpty());
     }

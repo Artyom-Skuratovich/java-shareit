@@ -1,9 +1,8 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.mapper;
 
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.booking.dto.SimpleBookingDto;
 import ru.practicum.shareit.item.dto.*;
-import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
