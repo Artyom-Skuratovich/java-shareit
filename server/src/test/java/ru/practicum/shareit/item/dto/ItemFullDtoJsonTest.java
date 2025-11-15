@@ -84,14 +84,12 @@ public class ItemFullDtoJsonTest {
                         "end": "2023-12-02T11:00:00",
                         "bookerId": 103
                     },
-                    "comments": [
-                        {
+                    "comments": [{
                             "id": 3,
                             "text": "Комментарий 1",
                             "authorName": "Автор3",
                             "created": "2023-12-01T12:00:00"
-                        },
-                        {
+                        }, {
                             "id": 4,
                             "text": "Комментарий 2",
                             "authorName": "Автор4",

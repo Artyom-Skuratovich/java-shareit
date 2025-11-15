@@ -36,13 +36,11 @@ public class ItemRequestItemsDtoJsonTest {
                   "id": 20,
                   "description": "Описание другого запроса",
                   "created": "2023-12-04T09:30",
-                  "items": [
-                    {
+                  "items": [{
                       "id": 3,
                       "name": "Товар А",
                       "ownerId": 300
-                    },
-                    {
+                    },{
                       "id": 4,
                       "name": "Товар Б",
                       "ownerId": 400
