@@ -137,4 +137,60 @@ public class BookingServiceTest {
             bookingService.findUserBookings(userId, State.ALL);
         });
     }
+
+    @Test
+    void findAllUserBookings() {
+        User booker = new User();
+        booker.setName("name");
+        booker.setEmail("qwerty@mail.ru");
+
+        booker = userRepository.save(booker);
+
+        Booking booking1 = new Booking();
+        booking1.setBooker(booker);
+        booking1.setStatus(BookingStatus.REJECTED);
+        booking1.setItem(item);
+        booking1.setStart(LocalDateTime.now());
+        booking1.setEnd(booking1.getStart().plusDays(1));
+
+        Booking booking2 = new Booking();
+        booking2.setBooker(booker);
+        booking2.setStatus(BookingStatus.REJECTED);
+        booking2.setItem(item);
+        booking2.setStart(LocalDateTime.now());
+        booking2.setEnd(booking2.getStart().plusDays(1));
+
+        bookingRepository.save(booking1);
+        bookingRepository.save(booking2);
+
+        assertEquals(2, bookingRepository.findAllByBookerId(booker.getId()).size());
+    }
+
+    @Test
+    void findPastUserBookings() {
+        User booker = new User();
+        booker.setName("name");
+        booker.setEmail("qwerty@mail.ru");
+
+        booker = userRepository.save(booker);
+
+        Booking booking1 = new Booking();
+        booking1.setBooker(booker);
+        booking1.setStatus(BookingStatus.REJECTED);
+        booking1.setItem(item);
+        booking1.setStart(LocalDateTime.now().minusDays(5));
+        booking1.setEnd(booking1.getStart().plusDays(1));
+
+        Booking booking2 = new Booking();
+        booking2.setBooker(booker);
+        booking2.setStatus(BookingStatus.REJECTED);
+        booking2.setItem(item);
+        booking2.setStart(LocalDateTime.now());
+        booking2.setEnd(booking2.getStart().plusDays(1));
+
+        bookingRepository.save(booking1);
+        bookingRepository.save(booking2);
+
+        assertEquals(1, bookingRepository.findPastBookingsByBookerId(booker.getId(), LocalDateTime.now()).size());
+    }
 }
