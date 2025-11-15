@@ -31,15 +31,13 @@ public class NewItemDtoJsonTest {
     @Test
     public void deserializeNewItemDto() throws Exception {
         String jsonContent = """
-                {
                   "name": "Модель",
                   "description": "Описание модели",
                   "available": false,
                   "requestId": 456
-                }
                 """;
 
-        NewItemDto item = json.parse(jsonContent).getObject();
+        NewItemDto item = json.parse("{" + jsonContent + "}").getObject();
 
         assertThat(item.getName()).isEqualTo("Модель");
         assertThat(item.getDescription()).isEqualTo("Описание модели");

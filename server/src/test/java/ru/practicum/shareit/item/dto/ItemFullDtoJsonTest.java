@@ -67,7 +67,6 @@ public class ItemFullDtoJsonTest {
     @Test
     public void deserializeItemFullDto() throws Exception {
         String jsonContent = """
-                {
                     "id": 7,
                     "name": "Предмет2",
                     "description": "Описание 2",
@@ -99,10 +98,9 @@ public class ItemFullDtoJsonTest {
                             "created": "2023-12-02T13:00:00"
                         }
                     ]
-                }
                 """;
 
-        ItemFullDto item = json.parse(jsonContent).getObject();
+        ItemFullDto item = json.parse("{" + jsonContent + "}").getObject();
 
         assertThat(item.getId()).isEqualTo(7L);
         assertThat(item.getName()).isEqualTo("Предмет2");

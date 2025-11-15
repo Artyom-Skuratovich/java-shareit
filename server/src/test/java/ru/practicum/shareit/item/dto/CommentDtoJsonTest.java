@@ -33,15 +33,13 @@ public class CommentDtoJsonTest {
     @Test
     public void deserializeCommentDto() throws Exception {
         String jsonContent = """
-                {
                   "id": 456,
                   "text": "Другое сообщение",
                   "authorName": "Петр",
                   "created": "2023-12-02T10:00:00"
-                }
                 """;
 
-        CommentDto comment = json.parse(jsonContent).getObject();
+        CommentDto comment = json.parse("{" + jsonContent + "}").getObject();
 
         assertThat(comment.getId()).isEqualTo(456L);
         assertThat(comment.getText()).isEqualTo("Другое сообщение");

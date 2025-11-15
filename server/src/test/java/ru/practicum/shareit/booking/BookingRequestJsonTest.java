@@ -32,14 +32,12 @@ public class BookingRequestJsonTest {
     @Test
     public void deserializeBookingRequest() throws Exception {
         String jsonContent = """
-                {
                   "itemId": 2,
                   "start": "2023-12-02T10:00:00",
                   "end": "2023-12-02T12:00:00"
-                }
                 """;
 
-        BookingRequest request = json.parse(jsonContent).getObject();
+        BookingRequest request = json.parse("{" + jsonContent + "}").getObject();
 
         assertThat(request.getItemId()).isEqualTo(2L);
         assertThat(request.getStart()).isEqualTo(LocalDateTime.of(2023, 12, 2, 10, 0));

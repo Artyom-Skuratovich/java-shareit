@@ -28,14 +28,12 @@ public class UpdateItemDtoJsonTest {
     @Test
     public void deserializeUpdateItemDto() throws Exception {
         String jsonContent = """
-                {
                   "name": "Новое имя",
                   "description": "Новое описание",
                   "available": true
-                }
                 """;
 
-        UpdateItemDto dto = json.parse(jsonContent).getObject();
+        UpdateItemDto dto = json.parse("{" + jsonContent + "}").getObject();
 
         assertThat(dto.getName()).isEqualTo("Новое имя");
         assertThat(dto.getDescription()).isEqualTo("Новое описание");

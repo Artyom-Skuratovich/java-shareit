@@ -31,14 +31,12 @@ public class ItemRequestDtoJsonTest {
     @Test
     public void deserializeItemRequestDto() throws Exception {
         String jsonContent = """
-                {
                   "id": 456,
                   "description": "Новый запрос",
                   "created": "2023-12-02T15:45:00"
-                }
                 """;
 
-        ItemRequestDto dto = json.parse(jsonContent).getObject();
+        ItemRequestDto dto = json.parse("{" + jsonContent + "}").getObject();
 
         assertThat(dto.getId()).isEqualTo(456L);
         assertThat(dto.getDescription()).isEqualTo("Новый запрос");

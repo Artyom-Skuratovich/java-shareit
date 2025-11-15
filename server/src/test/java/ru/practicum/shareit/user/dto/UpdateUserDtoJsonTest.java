@@ -27,13 +27,11 @@ public class UpdateUserDtoJsonTest {
     @Test
     public void deserializeUpdateUserDto() throws Exception {
         String jsonContent = """
-                {
                   "name": "Петр Петров",
                   "email": "petr@example.com"
-                }
                 """;
 
-        UpdateUserDto dto = json.parse(jsonContent).getObject();
+        UpdateUserDto dto = json.parse("{" + jsonContent + "}").getObject();
 
         assertThat(dto.getName()).isEqualTo("Петр Петров");
         assertThat(dto.getEmail()).isEqualTo("petr@example.com");
