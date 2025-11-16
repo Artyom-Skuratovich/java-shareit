@@ -1,0 +1,135 @@
+package ru.practicum.shareit.item.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.item.mapper.CommentMapper;
+import ru.practicum.shareit.item.mapper.ItemMapper;
+import ru.practicum.shareit.item.dto.*;
+import ru.practicum.shareit.item.model.Comment;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.CommentRepository;
+import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.common.exception.NotFoundException;
+import ru.practicum.shareit.common.exception.UserHasNoBookingsException;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
+import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+@Service
+public class ItemServiceImpl implements ItemService {
+    private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
+    private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
+
+    @Transactional
+    @Override
+    public ItemDto create(long userId, NewItemDto dto) {
+        final User user = userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException(String.format("Пользователь с id='%d' не найден", userId))
+        );
+        final ItemRequest request = dto.getRequestId() == null ?
+                null :
+                itemRequestRepository.findById(dto.getRequestId()).orElseThrow(
+                        () -> new NotFoundException(String.format("Запрос с id='%d' не найден", dto.getRequestId()))
+                );
+        final Item item = ItemMapper.mapToItem(dto, request);
+        item.setOwner(user);
+        return ItemMapper.mapToDto(itemRepository.save(item));
+    }
+
+    @Transactional
+    @Override
+    public ItemDto update(long userId, long itemId, UpdateItemDto dto) {
+        final Item item = itemRepository.findById(itemId).orElseThrow(
+                () -> new NotFoundException(String.format("Предмет с id='%d' не найден", itemId))
+        );
+        ItemMapper.updateItemProperties(item, dto);
+        if (item.getOwner().getId() != userId) {
+            throw new NotFoundException(
+                    String.format("Предмет с id='%d' не принадлежит пользователю с id='%d'", itemId, userId)
+            );
+        }
+        return ItemMapper.mapToDto(itemRepository.save(item));
+    }
+
+    @Override
+    public ItemFullDto find(long userId, long itemId) {
+        final Item item = itemRepository.findById(itemId).orElseThrow(
+                () -> new NotFoundException(String.format("Предмет с id='%d' не найден", itemId))
+        );
+        return toFullDto(item, LocalDateTime.now());
+    }
+
+    @Override
+    public List<ItemFullDto> findAll(long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NotFoundException(String.format("Пользователь с id='%d' не найден", userId));
+        }
+        final LocalDateTime now = LocalDateTime.now();
+        return itemRepository.findAllByOwnerId(userId).stream().map(i -> toFullDto(i, now)).toList();
+    }
+
+    @Override
+    public List<ItemDto> search(long userId, String text) {
+        return text.isBlank() ?
+                List.of() :
+                itemRepository.search(text).stream().map(ItemMapper::mapToDto).toList();
+    }
+
+    @Transactional
+    @Override
+    public CommentDto addComment(long userId, long itemId, NewCommentDto dto) {
+        final User author = userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException(String.format("Пользователь с id='%d' не найден", userId))
+        );
+        final Item item = itemRepository.findById(itemId).orElseThrow(
+                () -> new NotFoundException(String.format("Предмет с id='%d' не найден", itemId))
+        );
+        final Set<BookingStatus> includedStatuses = Set.of(BookingStatus.APPROVED);
+        if (!bookingRepository.existsPastBookingByBookerId(userId, itemId, LocalDateTime.now(), includedStatuses)) {
+            throw new UserHasNoBookingsException(String.format(
+                    "У пользователя с id='%d' нет завершённых бронирований предмета с id='%d'",
+                    userId,
+                    itemId
+            ));
+        }
+        final Comment saved = commentRepository.save(CommentMapper.mapToComment(dto, author, item));
+        return CommentMapper.mapToDto(saved);
+    }
+
+    private ItemFullDto toFullDto(Item item, LocalDateTime date) {
+        final Booking last = bookingRepository.findLastBookingsByItemId(
+                item.getId(),
+                date,
+                Set.of(BookingStatus.APPROVED, BookingStatus.CANCELED),
+                PageRequest.of(0, 1)
+        ).stream().findFirst().orElse(null);
+        final Booking next = bookingRepository.findFutureBookingsByItemId(
+                item.getId(),
+                date,
+                Set.of(BookingStatus.APPROVED),
+                PageRequest.of(0, 1)
+        ).stream().findFirst().orElse(null);
+        return ItemMapper.mapToFullDto(
+                item,
+                last != null ? BookingMapper.mapToSimpleDto(last) : null,
+                next != null ? BookingMapper.mapToSimpleDto(next) : null,
+                commentRepository.findCommentsByItemId(item.getId()).stream().map(CommentMapper::mapToDto).toList()
+        );
+    }
+}
